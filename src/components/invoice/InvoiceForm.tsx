@@ -82,10 +82,13 @@ export default function InvoiceForm({
 
         if (profileResult.data) {
           setUserProfile(profileResult.data);
-          setFormData(prev => ({
-            ...prev,
-            currency: profileResult.data?.default_currency || 'USD'
-          }));
+          // Only set default currency if no initial currency was provided
+          if (!initialData?.currency) {
+            setFormData(prev => ({
+              ...prev,
+              currency: profileResult.data?.default_currency || 'USD'
+            }));
+          }
         }
 
         if (clientsResult.data) {
@@ -100,6 +103,16 @@ export default function InvoiceForm({
       loadInitialData();
     }
   }, [user]);
+
+  // Handle initialData changes (for edit mode)
+  useEffect(() => {
+    if (initialData && mode === 'edit') {
+      setFormData(prev => ({
+        ...prev,
+        ...initialData
+      }));
+    }
+  }, [initialData, mode]);
 
   // Handle form field changes
   const handleChange = useCallback((field: keyof InvoiceFormData, value: any) => {

@@ -45,49 +45,32 @@ export default function InvoiceEditPage() {
     );
   }
 
-  // Transform invoice data for the form
+  // Transform invoice data for the form (using the same field names as InvoiceForm expects)
   const initialData = {
-    // Business details (these would come from user profile in a real app)
-    businessName: '',
-    businessEmail: '',
-    businessAddress: '',
-    businessPhone: '',
+    // Client details - using database field names that the form expects
+    buyer_name: invoice.buyer_name,
+    buyer_email: invoice.buyer_email || '',
+    buyer_address: invoice.buyer_address || '',
     
-    // Client details
-    clientName: invoice.buyer_name,
-    clientEmail: invoice.buyer_email || '',
-    clientAddress: invoice.buyer_address || '',
+    // Service details - using database field names
+    service_name: invoice.service_name,
+    qty: invoice.qty,
+    unit_net_price: invoice.unit_net_price,
     
-    // Invoice details
-    invoiceNumber: invoice.id.slice(-6), // Use last 6 chars of ID as display number
-    issueDate: invoice.issued_at ? new Date(invoice.issued_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-    dueDate: invoice.due_date || '',
-    
-    // Service details
-    serviceName: invoice.service_name,
-    quantity: invoice.qty.toString(),
-    unitPrice: invoice.unit_net_price.toString(),
-    
-    // Tax and totals
-    vatRate: invoice.vat_rate.toString(),
+    // Tax and other details
+    vat_rate: invoice.vat_rate,
     currency: invoice.currency,
     
     // Additional details
-    accountNumber: invoice.account_no || '',
-    paymentLink: invoice.payment_link || '',
+    account_no: invoice.account_no || '',
+    payment_link: invoice.payment_link || '',
+    due_date: invoice.due_date || '',
+    status: invoice.status,
     
-    // Notes and terms (not in current schema but could be added)
-    notes: '',
-    terms: ''
+    // Notes (optional field)
+    notes: invoice.notes || ''
   };
 
-  const handleFormSubmit = async (formData: any) => {
-    // The InvoiceForm will handle the API call
-    // After successful update, navigate back to the invoice view
-    setTimeout(() => {
-      navigateToInvoice(invoiceId);
-    }, 1000);
-  };
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -119,7 +102,7 @@ export default function InvoiceEditPage() {
         <InvoiceForm 
           initialData={initialData}
           invoiceId={invoiceId} // Pass invoiceId for update mode
-          onSubmitSuccess={handleFormSubmit}
+          onSuccess={() => navigateToInvoice(invoiceId)}
           mode="edit"
         />
       </div>

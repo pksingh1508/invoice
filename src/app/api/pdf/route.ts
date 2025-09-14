@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { invoiceQueries } from "@/lib/database/invoices";
-import { profileQueries } from "@/lib/database/profiles";
+import { profileServerQueries } from "@/lib/database/profiles";
 import { 
   generateInvoicePDF,
   generateInvoicePDFForEmail,
@@ -52,21 +52,30 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Get user profile
-    const profileResult = await profileQueries.getCurrentProfile();
-    const userProfile = profileResult.data;
+    // Get user profile using server-side query
+    const profileResult = await profileServerQueries.getProfile(userId);
+    let userProfile = profileResult.data;
     
+    // If profile doesn't exist, create a default one for PDF generation
     if (!userProfile) {
-      return NextResponse.json(
-        { error: "User profile not found" },
-        { status: 400 }
-      );
+      userProfile = {
+        id: userId,
+        business_name: 'Your Business',
+        business_email: '',
+        business_phone: '',
+        business_address: '',
+        logo_url: '',
+        default_currency: 'USD',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
     }
     
     // Generate branding from profile
     const branding = generateBrandingFromProfile(userProfile);
     
     // Create render options
+    console.log('Creating render options for template:', template_id);
     const renderOptions = createRenderOptionsFromInvoiceData(
       template_id,
       invoiceResult.data,
@@ -74,12 +83,29 @@ export async function POST(request: NextRequest) {
       branding
     );
     
+    console.log('Render options created:', {
+      template_id: renderOptions.template_id,
+      business_name: renderOptions.data?.business?.name,
+      client_name: renderOptions.data?.client?.name,
+      invoice_number: renderOptions.data?.invoice?.number
+    });
+    
     // Generate PDF
+    console.log('Generating PDF with options:', {
+      template_id,
+      invoice_id,
+      userProfile: {
+        business_name: userProfile.business_name,
+        business_email: userProfile.business_email
+      }
+    });
+    
     const pdfResult = for_email 
       ? await generateInvoicePDFForEmail(renderOptions, { format, quality })
       : await generateInvoicePDF(renderOptions, { format, quality });
     
     if (!pdfResult.success) {
+      console.error('PDF generation failed:', pdfResult.error);
       return NextResponse.json(
         { error: pdfResult.error || "PDF generation failed" },
         { status: 500 }

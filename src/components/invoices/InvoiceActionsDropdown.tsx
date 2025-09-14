@@ -15,6 +15,7 @@ import {
   PrinterIcon,
   AlertTriangleIcon
 } from 'lucide-react';
+import { downloadInvoicePDF } from '@/lib/utils/pdfDownload';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -150,12 +151,16 @@ export function InvoiceActionsDropdown({
     }
   };
 
-  const handlePdfDownload = () => {
+  const handlePdfDownload = async () => {
     if (onPdfDownload) {
       onPdfDownload(invoice.id);
     } else {
-      // TODO: Implement default PDF download
-      console.log('PDF download not implemented yet');
+      // Use default PDF download implementation
+      try {
+        await downloadInvoicePDF(invoice.id);
+      } catch (error) {
+        alert(error instanceof Error ? error.message : 'Failed to download PDF');
+      }
     }
   };
 
