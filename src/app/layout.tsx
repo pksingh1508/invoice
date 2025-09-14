@@ -8,6 +8,8 @@ import {
   UserButton
 } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Navigation } from "@/components/layout/Navigation";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -36,13 +38,13 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <header className="border-b bg-white">
-            <div className="flex justify-between items-center p-4 max-w-7xl mx-auto">
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold text-gray-900">Invoice Generator</h1>
-              </div>
-              <div className="flex items-center gap-4">
-                <SignedOut>
+          <SignedOut>
+            <header className="border-b bg-white">
+              <div className="flex justify-between items-center p-4 max-w-7xl mx-auto">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-xl font-bold text-gray-900">Invoice Generator</h1>
+                </div>
+                <div className="flex items-center gap-4">
                   <SignInButton>
                     <button className="text-gray-700 hover:text-gray-900 font-medium">
                       Sign In
@@ -53,14 +55,17 @@ export default function RootLayout({
                       Sign Up
                     </button>
                   </SignUpButton>
-                </SignedOut>
-                <SignedIn>
-                  <UserButton afterSignOutUrl="/" />
-                </SignedIn>
+                </div>
               </div>
-            </div>
-          </header>
+            </header>
+          </SignedOut>
+          
+          <SignedIn>
+            <Navigation />
+          </SignedIn>
+          
           {children}
+          <Toaster richColors position="top-right" />
         </body>
       </html>
     </ClerkProvider>

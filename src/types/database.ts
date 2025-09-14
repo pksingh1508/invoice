@@ -25,10 +25,10 @@ export interface CreateUserProfile {
 
 export interface UpdateUserProfile {
   business_name?: string;
-  business_email?: string;
-  business_phone?: string;
-  business_address?: string;
-  logo_url?: string;
+  business_email?: string | null;
+  business_phone?: string | null;
+  business_address?: string | null;
+  logo_url?: string | null;
   default_currency?: string;
 }
 
