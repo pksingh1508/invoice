@@ -57,17 +57,16 @@ export async function GET(request: NextRequest) {
 
     const totalPages = Math.ceil((count || 0) / (params.limit || 10));
 
-    return NextResponse.json(
-      createSuccessResponse({
-        clients: data || [],
-        pagination: {
-          page: params.page || 1,
-          limit: params.limit || 10,
-          total: count || 0,
-          totalPages
-        }
-      })
-    );
+    // Return in PaginatedResponse format
+    return NextResponse.json({
+      data: data || [],
+      pagination: {
+        page: params.page || 1,
+        limit: params.limit || 10,
+        total: count || 0,
+        totalPages
+      }
+    });
   } catch (error) {
     const errorResponse = handleApiError(error);
     return NextResponse.json(errorResponse, { status: 500 });
