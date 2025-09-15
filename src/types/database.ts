@@ -8,6 +8,7 @@ export interface UserProfile {
   business_phone?: string;
   business_address?: string;
   logo_url?: string;
+  signature_url?: string;
   default_currency: string;
   created_at: string;
   updated_at: string;
@@ -20,6 +21,7 @@ export interface CreateUserProfile {
   business_phone?: string;
   business_address?: string;
   logo_url?: string;
+  signature_url?: string;
   default_currency?: string;
 }
 
@@ -29,6 +31,7 @@ export interface UpdateUserProfile {
   business_phone?: string | null;
   business_address?: string | null;
   logo_url?: string | null;
+  signature_url?: string | null;
   default_currency?: string;
 }
 

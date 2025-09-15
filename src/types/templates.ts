@@ -10,6 +10,7 @@ export interface InvoiceTemplateData {
     logo_url?: string;
     website?: string;
     tax_number?: string;
+    signature_url?: string;
   };
   
   // Client/Buyer Information

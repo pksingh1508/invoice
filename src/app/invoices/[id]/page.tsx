@@ -21,7 +21,7 @@ import { InvoiceActionsDropdown } from '@/components/invoices/InvoiceActionsDrop
 import { useInvoice, useInvoiceNavigation } from '@/hooks/useInvoiceActions';
 import { formatCurrency } from '@/lib/utils/currency';
 import { formatDate } from '@/lib/utils/date';
-import { getDefaultTemplate } from '@/lib/pdf/templates';
+import PDFDownload from '@/components/invoice/PDFDownload';
 
 const statusConfig = {
   draft: { label: 'Draft', className: 'bg-gray-100 text-gray-800' },
@@ -36,57 +36,6 @@ export default function InvoiceViewPage() {
   const { navigateToInvoicesList, navigateToEditInvoice } = useInvoiceNavigation();
   
   const { invoice, isLoading, error } = useInvoice(invoiceId);
-  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
-
-  const handlePDFDownload = async () => {
-    try {
-      setIsDownloadingPDF(true);
-      
-      const response = await fetch('/api/pdf', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          invoice_id: invoiceId,
-          template_id: getDefaultTemplate().id,
-          format: 'blob',
-          quality: 'standard',
-          for_email: false
-        }),
-      });
-      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to generate PDF');
-      }
-      
-      // Get filename from response headers or create default
-      const contentDisposition = response.headers.get('Content-Disposition');
-      const filename = contentDisposition
-        ? contentDisposition.split('filename=')[1]?.replace(/"/g, '')
-        : `invoice-${invoice.id.slice(-6)}.pdf`;
-      
-      // Create blob and download
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      link.style.display = 'none';
-      
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      
-    } catch (error) {
-      console.error('PDF Download Error:', error);
-      alert(error instanceof Error ? error.message : 'Failed to download PDF');
-    } finally {
-      setIsDownloadingPDF(false);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -161,15 +110,12 @@ export default function InvoiceViewPage() {
               Print
             </Button>
             
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handlePDFDownload}
-              disabled={isDownloadingPDF}
-            >
-              <DownloadIcon className={`w-4 h-4 mr-2 ${isDownloadingPDF ? 'animate-spin' : ''}`} />
-              {isDownloadingPDF ? 'Generating...' : 'Download PDF'}
-            </Button>
+            <PDFDownload 
+              invoiceId={invoiceId}
+              invoiceNumber={invoice.id.slice(-6)}
+              clientName={invoice.buyer_name}
+              className=""
+            />
             
             <Button 
               variant="default" 
@@ -180,8 +126,7 @@ export default function InvoiceViewPage() {
             </Button>
             
             <InvoiceActionsDropdown 
-              invoice={invoice} 
-              onPdfDownload={handlePDFDownload}
+              invoice={invoice}
             />
           </div>
         </div>

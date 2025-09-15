@@ -2,12 +2,14 @@ import { AvailableTemplate, TemplateCategory } from '@/types/templates';
 import { classicTemplate } from './classic';
 import { modernTemplate } from './modern';
 import { minimalTemplate } from './minimal';
+import { businessTemplate } from './business';
 
 // All available templates
 export const AVAILABLE_TEMPLATES: AvailableTemplate[] = [
   classicTemplate,    // Default template
   modernTemplate,
-  minimalTemplate
+  minimalTemplate,
+  businessTemplate
 ];
 
 // Get template by ID
@@ -88,9 +90,10 @@ export function isValidTemplateId(id: string): boolean {
 }
 
 // Export individual templates for direct import
-export { classicTemplate, modernTemplate, minimalTemplate };
+export { classicTemplate, modernTemplate, minimalTemplate, businessTemplate };
 
 // Export template configurations
 export { classicTemplateConfig } from './classic';
 export { modernTemplateConfig } from './modern';
 export { minimalTemplateConfig } from './minimal';
+export { businessTemplateConfig } from './business';

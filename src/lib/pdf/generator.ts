@@ -14,13 +14,15 @@ import { applyBrandingToTemplate } from '@/lib/pdf/branding';
 
 // Import PDF template components
 import ClassicTemplate from './components/ClassicTemplate';
+import BusinessTemplate from './components/BusinessTemplate';
 
 // Template component mapping
 const TEMPLATE_COMPONENTS = {
   'classic-professional': ClassicTemplate,
-  // Will add more templates here
-  // 'modern-bold': ModernTemplate,
-  // 'minimal-clean': MinimalTemplate,
+  'modern-bold': ClassicTemplate, // Using ClassicTemplate with modern config
+  'minimal-clean': ClassicTemplate, // Using ClassicTemplate with minimal config
+  'business-professional': BusinessTemplate, // New business template
+  // TODO: Create dedicated ModernTemplate and MinimalTemplate components
 } as const;
 
 export interface PDFGenerationResult {
@@ -352,7 +354,9 @@ export function createRenderOptionsFromInvoiceData(
       email: userProfile?.business_email || '',
       phone: userProfile?.business_phone,
       address: userProfile?.business_address,
-      logo_url: userProfile?.logo_url
+      logo_url: userProfile?.logo_url,
+      signature_url: userProfile?.signature_url || undefined,
+      tax_number: userProfile?.tax_number || undefined // Add tax number support
     },
     client: {
       name: invoiceData.buyer_name,
